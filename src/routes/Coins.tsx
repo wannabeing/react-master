@@ -16,13 +16,15 @@ const Header = styled.header`
   font-size: 48px;
 `;
 const Body = styled.div`
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 const CoinList = styled.ul`
   width: 100%;
+`;
+const CoinImg = styled.img`
+  width: 4vw;
 `;
 const Coin = styled.li`
   display: flex;
@@ -56,14 +58,47 @@ interface DataInterface {
 function Coins() {
   const [data, setData] = useState<DataInterface[]>([]);
   const [loading, setLoading] = useState(true);
+  const apiUrl = "https://cryptocurrencyliveprices.com/img/";
 
   useEffect(() => {
     (async () => {
-      const json = await (
-        await fetch("https://api.coinpaprika.com/v1/coins")
-      ).json();
+      // const json = await (
+      //   await fetch("https://api.coinpaprika.com/v1/coins")
+      // ).json();
 
-      setData(json.slice(0, 100));
+      // console.log(json);
+
+      // setData(json.slice(0, 100));
+
+      setData([
+        {
+          id: "btc-bitcoin",
+          name: "Bitcoin",
+          symbol: "BTC",
+          rank: 1,
+          is_new: false,
+          is_active: true,
+          type: "coin",
+        },
+        {
+          id: "eth-ethereum",
+          name: "Ethereum",
+          symbol: "ETH",
+          rank: 2,
+          is_new: false,
+          is_active: true,
+          type: "coin",
+        },
+        {
+          id: "hex-hex",
+          name: "HEX",
+          symbol: "HEX",
+          rank: 3,
+          is_new: false,
+          is_active: true,
+          type: "token",
+        },
+      ]);
       setLoading(false);
     })();
   }, []);
@@ -78,8 +113,18 @@ function Coins() {
         ) : (
           <CoinList>
             {data.map((coin) => (
-              <Link key={coin.id} to={coin.id}>
+              <Link
+                key={coin.id}
+                to={{
+                  pathname: coin.id,
+                  state: {
+                    name: coin.name,
+                    rank: coin.rank,
+                  },
+                }}
+              >
                 <Coin>
+                  <CoinImg src={`${apiUrl}${coin.id}.png`} alt="코인이미지" />
                   <span>{coin.name}</span>
                   <span>&rarr;</span>
                 </Coin>
