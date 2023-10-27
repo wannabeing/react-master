@@ -2,6 +2,8 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { PacmanLoader } from "react-spinners";
+import { useQuery } from "react-query";
+import { getCoinList } from "../api";
 
 const Container = styled.div`
   padding: 0 20px;
@@ -45,7 +47,7 @@ const Title = styled.h1`
   /* color: ${(props) => props.theme.accentColor}; */
 `;
 
-interface DataInterface {
+interface IData {
   id: string;
   name: string;
   symbol: string;
@@ -56,63 +58,20 @@ interface DataInterface {
 }
 
 function Coins() {
-  const [data, setData] = useState<DataInterface[]>([]);
-  const [loading, setLoading] = useState(true);
-  const apiUrl = "https://cryptocurrencyliveprices.com/img/";
+  const imgApiUrl = "https://cryptocurrencyliveprices.com/img/";
+  const { isLoading, data } = useQuery<IData[]>("getCoinList", getCoinList);
 
-  useEffect(() => {
-    (async () => {
-      // const json = await (
-      //   await fetch("https://api.coinpaprika.com/v1/coins")
-      // ).json();
-
-      // console.log(json);
-
-      // setData(json.slice(0, 100));
-
-      setData([
-        {
-          id: "btc-bitcoin",
-          name: "Bitcoin",
-          symbol: "BTC",
-          rank: 1,
-          is_new: false,
-          is_active: true,
-          type: "coin",
-        },
-        {
-          id: "eth-ethereum",
-          name: "Ethereum",
-          symbol: "ETH",
-          rank: 2,
-          is_new: false,
-          is_active: true,
-          type: "coin",
-        },
-        {
-          id: "hex-hex",
-          name: "HEX",
-          symbol: "HEX",
-          rank: 3,
-          is_new: false,
-          is_active: true,
-          type: "token",
-        },
-      ]);
-      setLoading(false);
-    })();
-  }, []);
   return (
     <Container>
       <Header>
         <Title>COIN</Title>
       </Header>
       <Body>
-        {loading ? (
+        {isLoading ? (
           <PacmanLoader />
         ) : (
           <CoinList>
-            {data.map((coin) => (
+            {data?.slice(0, 100).map((coin) => (
               <Link
                 key={coin.id}
                 to={{
@@ -124,7 +83,10 @@ function Coins() {
                 }}
               >
                 <Coin>
-                  <CoinImg src={`${apiUrl}${coin.id}.png`} alt="코인이미지" />
+                  <CoinImg
+                    src={`${imgApiUrl}${coin.id}.png`}
+                    alt="코인이미지"
+                  />
                   <span>{coin.name}</span>
                   <span>&rarr;</span>
                 </Coin>

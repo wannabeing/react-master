@@ -11,6 +11,8 @@ import PacmanLoader from "react-spinners/PacmanLoader";
 import styled from "styled-components";
 import TapPrice from "./TapPrice";
 import TapChart from "./TapChart";
+import { useQuery } from "react-query";
+import { getCoinInfo, getCoinPriceInfo } from "../api";
 
 interface CoinParams {
   coinID: string;
@@ -36,7 +38,7 @@ interface ICoinInfo {
   last_data_at: string;
 }
 
-interface ICoinPrice {
+interface IPriceInfo {
   id: string;
   name: string;
   symbol: string;
@@ -69,6 +71,7 @@ interface ICoinPrice {
     };
   };
 }
+
 const Container = styled.div`
   padding: 0 20px;
   max-width: 480px;
@@ -127,42 +130,32 @@ const Tap = styled.div<{ isActive: boolean }>`
 function Coin() {
   const { coinID } = useParams<CoinParams>();
   const { state } = useLocation<ICoinInfo>();
-  const [coinInfo, setCoinInfo] = useState<ICoinInfo>();
-  const [coinPrice, setCoinPrice] = useState<ICoinPrice>();
-  const [loading, setLoading] = useState(true);
   const priceMatch = useRouteMatch("/:coinID/price");
   const chartMatch = useRouteMatch("/:coinID/chart");
-  console.log(priceMatch);
 
-  useEffect(() => {
-    (async () => {
-      const coinInfo = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinID}`)
-      ).json();
-      const priceInfo = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinID}`)
-      ).json();
-
-      setCoinInfo(coinInfo);
-      setCoinPrice(priceInfo);
-      setLoading(false); // loading 해제
-    })();
-  }, [coinID]);
+  const { isLoading: infoLoading, data: coinInfo } = useQuery<ICoinInfo>(
+    ["coinInfo", coinID],
+    () => getCoinInfo(coinID)
+  );
+  const { isLoading: priceLoading, data: priceInfo } = useQuery<IPriceInfo>(
+    ["priceInfo", coinID],
+    () => getCoinPriceInfo(coinID)
+  );
 
   return (
-    <>
-      {loading ? (
-        <PacmanLoader />
-      ) : (
-        <Container>
-          <Header>
-            <Link to="/">&larr;</Link>
-            <div>
-              <span>RANK {state?.rank ? state.rank : coinInfo?.rank} | </span>
-              <span> {state?.name ? state.name : coinInfo?.name}</span>
-            </div>
-          </Header>
-          <Body>
+    <Container>
+      <Header>
+        <Link to="/">&larr;</Link>
+        <div>
+          <span>RANK {state?.rank ? state.rank : coinInfo?.rank} | </span>
+          <span> {state?.name ? state.name : coinInfo?.name}</span>
+        </div>
+      </Header>
+      <Body>
+        {priceLoading || infoLoading ? (
+          <PacmanLoader />
+        ) : (
+          <>
             <div>
               {coinInfo?.description
                 ? coinInfo.description
@@ -170,27 +163,27 @@ function Coin() {
             </div>
             <TapWrapper>
               <Taps>
-                <Link to={`/${coinID}/price`}>
-                  <Tap isActive={priceMatch ? true : false}>PRICE</Tap>
-                </Link>
                 <Link to={`/${coinID}/chart`}>
                   <Tap isActive={chartMatch ? true : false}>CHART</Tap>
+                </Link>
+                <Link to={`/${coinID}/price`}>
+                  <Tap isActive={priceMatch ? true : false}>PRICE</Tap>
                 </Link>
               </Taps>
 
               <Switch>
+                <Route path={`/${coinID}/chart`}>
+                  <TapChart coinID={coinID} />
+                </Route>
                 <Route path={`/${coinID}/price`}>
                   <TapPrice />
                 </Route>
-                <Route path={`/${coinID}/chart`}>
-                  <TapChart />
-                </Route>
               </Switch>
             </TapWrapper>
-          </Body>
-        </Container>
-      )}
-    </>
+          </>
+        )}
+      </Body>
+    </Container>
   );
 }
 
