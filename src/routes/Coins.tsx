@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import Helmet from "react-helmet";
 import { PacmanLoader } from "react-spinners";
 import { useQuery } from "react-query";
 import { getCoinList } from "../api";
@@ -63,6 +63,9 @@ function Coins() {
 
   return (
     <Container>
+      <Helmet>
+        <title>COIN</title>
+      </Helmet>
       <Header>
         <Title>COIN</Title>
       </Header>

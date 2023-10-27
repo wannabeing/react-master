@@ -2,7 +2,6 @@ import { useQuery } from "react-query";
 import { getCoinHistory } from "../api";
 import ApexChart from "react-apexcharts";
 import styled from "styled-components";
-import { title } from "process";
 
 interface ChartProps {
   coinID: string;
@@ -28,33 +27,53 @@ function TapChart({ coinID }: ChartProps) {
     ["chartInfo", coinID],
     () => getCoinHistory(coinID)
   );
+
   return (
     <ChartWrapper>
       {chartLoading ? (
-        "LOADING"
+        ""
       ) : (
         <ApexChart
           type="candlestick"
           series={[
             {
-              data: [
-                {
-                  x: 1538778600000,
-                  y: [6629.81, 6650.5, 6623.04, 6633.33],
-                },
-              ],
+              name: "Price",
+              data:
+                chartInfo?.map((chart) => ({
+                  x: chart.time_open,
+                  y: [
+                    parseFloat(chart.open),
+                    parseFloat(chart.high),
+                    parseFloat(chart.low),
+                    parseFloat(chart.close),
+                  ],
+                })) ?? [],
             },
           ]}
           options={{
             chart: {
               width: "100%",
+              toolbar: {
+                tools: {
+                  selection: false,
+                  pan: false,
+                },
+              },
             },
             title: {
               align: "left",
-              text: coinID,
+              text: coinID.toUpperCase(),
             },
             xaxis: {
               type: "datetime",
+              labels: {
+                datetimeFormatter: {
+                  minute: "HH:mm",
+                },
+              },
+            },
+            yaxis: {
+              show: false,
             },
           }}
         />
