@@ -54,5 +54,5 @@
     "@types/react-helmet": "^6.1.8",
     "@types/react-router-dom": "^5.3.3"
   },
-  "homepage": "https://wannabeing.github.io/react-master/"
+  "homepage": "https://wannabeing.github.io/react-master"
 }
