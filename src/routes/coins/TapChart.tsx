@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { getCoinHistory } from "../api";
+import { getCoinHistory } from "../../api";
 import ApexChart from "react-apexcharts";
 import styled from "styled-components";
 

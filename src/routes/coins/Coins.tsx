@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import Helmet from "react-helmet";
 import { PacmanLoader } from "react-spinners";
 import { useQuery } from "react-query";
-import { getCoinList } from "../api";
+import { getCoinList } from "../../api";
 import { useSetRecoilState } from "recoil";
-import { darkThemeAtom } from "../atoms";
+import { darkThemeAtom } from "../../atoms";
 
 const Container = styled.div`
   padding: 0 20px;
@@ -89,7 +89,7 @@ function Coins() {
               <Link
                 key={coin.id}
                 to={{
-                  pathname: coin.id,
+                  pathname: `/coin/${coin.id}`,
                   state: {
                     name: coin.name,
                     rank: coin.rank,

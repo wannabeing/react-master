@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { getCoinPriceInfo } from "../api";
+import { getCoinPriceInfo } from "../../api";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 

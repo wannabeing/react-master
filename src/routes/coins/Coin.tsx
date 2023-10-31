@@ -12,7 +12,7 @@ import styled from "styled-components";
 import TapPrice from "./TapPrice";
 import TapChart from "./TapChart";
 import { useQuery } from "react-query";
-import { getCoinInfo } from "../api";
+import { getCoinInfo } from "../../api";
 
 interface CoinParams {
   coinID: string;
@@ -111,7 +111,7 @@ function Coin() {
         <title>{coinID}</title>
       </Helmet>
       <Header>
-        <Link to="/">&larr;</Link>
+        <Link to="/coin">&larr;</Link>
         <div>
           <span>RANK {state?.rank ? state.rank : coinInfo?.rank} | </span>
           <span> {state?.name ? state.name : coinInfo?.name}</span>
@@ -125,19 +125,19 @@ function Coin() {
             <div>{coinInfo?.description ? coinInfo.description : ""}</div>
             <TapWrapper>
               <Taps>
-                <Link to={`/${coinID}/chart`}>
+                <Link to={`/coin/${coinID}/chart`}>
                   <Tap isActive={chartMatch ? true : false}>CHART</Tap>
                 </Link>
-                <Link to={`/${coinID}/price`}>
+                <Link to={`/coin/${coinID}/price`}>
                   <Tap isActive={priceMatch ? true : false}>PRICE</Tap>
                 </Link>
               </Taps>
 
               <Switch>
-                <Route path={`/${coinID}/chart`}>
+                <Route path={`/coin/${coinID}/chart`}>
                   <TapChart coinID={coinID} />
                 </Route>
-                <Route path={`/${coinID}/price`}>
+                <Route path={`/coin/${coinID}/price`}>
                   <TapPrice coinID={coinID} />
                 </Route>
               </Switch>
