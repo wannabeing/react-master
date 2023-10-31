@@ -89,6 +89,7 @@ const Tap = styled.div<{ isActive: boolean }>`
   padding: 10px 20px;
   border-radius: 15px;
   &:hover {
+    color: ${(props) => props.theme.bgColor};
     background-color: ${(props) => props.theme.accentColor};
   }
 `;
@@ -121,11 +122,7 @@ function Coin() {
           <PacmanLoader />
         ) : (
           <>
-            <div>
-              {coinInfo?.description
-                ? coinInfo.description
-                : "testtesttesttesttesttesttesttesttesttesttesttesttest"}
-            </div>
+            <div>{coinInfo?.description ? coinInfo.description : ""}</div>
             <TapWrapper>
               <Taps>
                 <Link to={`/${coinID}/chart`}>

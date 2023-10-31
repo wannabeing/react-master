@@ -4,6 +4,8 @@ import Helmet from "react-helmet";
 import { PacmanLoader } from "react-spinners";
 import { useQuery } from "react-query";
 import { getCoinList } from "../api";
+import { useSetRecoilState } from "recoil";
+import { darkThemeAtom } from "../atoms";
 
 const Container = styled.div`
   padding: 0 20px;
@@ -40,11 +42,13 @@ const Coin = styled.li`
   cursor: pointer;
 
   &:hover {
+    color: ${(props) => props.theme.bgColor};
     background-color: ${(props) => props.theme.accentColor};
   }
 `;
-const Title = styled.h1`
-  /* color: ${(props) => props.theme.accentColor}; */
+const DarkDiv = styled.div`
+  position: absolute;
+  right: 10%;
 `;
 
 interface IData {
@@ -60,6 +64,7 @@ interface IData {
 function Coins() {
   const imgApiUrl = "https://cryptocurrencyliveprices.com/img/";
   const { isLoading, data } = useQuery<IData[]>("getCoinList", getCoinList);
+  const setDarkTheme = useSetRecoilState(darkThemeAtom);
 
   return (
     <Container>
@@ -67,8 +72,14 @@ function Coins() {
         <title>COIN</title>
       </Helmet>
       <Header>
-        <Title>COIN</Title>
+        <h1>COIN</h1>
+        <DarkDiv>
+          <button onClick={() => setDarkTheme((prev) => !prev)}>
+            다크모드
+          </button>
+        </DarkDiv>
       </Header>
+
       <Body>
         {isLoading ? (
           <PacmanLoader />
