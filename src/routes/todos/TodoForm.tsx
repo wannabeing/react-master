@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { todosAtom } from "../../atoms";
+import { categoriesAtom, todoCategoryAtom, todosAtom } from "../../atoms";
 
 const Form = styled.form`
   margin-top: 20px;
@@ -40,19 +40,30 @@ const onInvalid = (data: any) => {};
 interface IForm {
   todo: string;
 }
+interface IFormCategory {
+  category: string;
+}
 
 function TodoForm() {
   // recoil setState
   const setTodos = useSetRecoilState(todosAtom);
+  const [categoryState, setCategorystate] = useRecoilState(todoCategoryAtom);
+  const [categories, setCategories] = useRecoilState(categoriesAtom);
 
   // react-hook-form
   const {
-    register,
-    handleSubmit,
+    register: todoRegister,
+    handleSubmit: todoHandleSubmit,
     setError,
     setValue,
     formState: { errors },
   } = useForm<IForm>();
+
+  const {
+    register: categoryRegister,
+    handleSubmit: categoryHandleSubmit,
+    setValue: setCategoryVal,
+  } = useForm<IFormCategory>();
 
   // 🚀 (함수) 유효한 값을 받았을 때
   const onValid = ({ todo }: IForm) => {
@@ -69,34 +80,61 @@ function TodoForm() {
     }
     // recoil state 저장
     setTodos((prev) => [
-      { id: Date.now(), text: todo, category: "TODO" },
+      { id: Date.now(), text: todo, category: categoryState },
       ...prev,
     ]);
     setValue("todo", ""); // input 초기화
   };
 
+  const onSelectInput = (event: React.FormEvent<HTMLSelectElement>) => {
+    setCategorystate(event.currentTarget.value);
+  };
+
+  const onCategorySubmit = ({ category }: IFormCategory) => {
+    setCategories((prev) => [...prev, category]);
+    setCategoryVal("category", "");
+  };
+
   return (
-    <Form onSubmit={handleSubmit(onValid, onInvalid)}>
-      <input
-        {...register("todo", {
-          required: "값을 입력해주세요",
-          minLength: { message: "5자 이상입니다.", value: 5 },
-          pattern: {
-            value: /^[^\d]+$/,
-            message: "숫자는 들어가면 안됩니다.",
-          },
-          validate: {
-            todoValidate1: todoValidate1,
-            todoValidate2: todoValidate2,
-            todoValidate3: todoValidate3,
-          },
-        })}
-        type="text"
-        placeholder="입력하시오"
-      />
-      <ErrorMessage>{errors?.todo?.message as string}</ErrorMessage>
-      <button>submit</button>
-    </Form>
+    <>
+      <Form onSubmit={categoryHandleSubmit(onCategorySubmit)}>
+        <input
+          {...categoryRegister("category")}
+          id="category"
+          type="text"
+          placeholder="사용자 카테고리 추가하기"
+        />
+        <button>추가</button>
+      </Form>
+      <Form onSubmit={todoHandleSubmit(onValid, onInvalid)}>
+        <select onInput={onSelectInput}>
+          {categories.map((cateogry) => (
+            <option key={cateogry} value={cateogry}>
+              {cateogry}
+            </option>
+          ))}
+        </select>
+        <input
+          {...todoRegister("todo", {
+            required: "값을 입력해주세요",
+            minLength: { message: "5자 이상입니다.", value: 5 },
+            pattern: {
+              value: /^[^\d]+$/,
+              message: "숫자는 들어가면 안됩니다.",
+            },
+            validate: {
+              todoValidate1: todoValidate1,
+              todoValidate2: todoValidate2,
+              todoValidate3: todoValidate3,
+            },
+          })}
+          type="text"
+          placeholder="할 일을 입력하시오"
+        />
+        <ErrorMessage>{errors?.todo?.message as string}</ErrorMessage>
+        <button>저장</button>
+      </Form>
+    </>
   );
 }
 
