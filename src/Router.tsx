@@ -1,7 +1,7 @@
 import { HashRouter, Route, Switch } from "react-router-dom";
 import Coins from "./routes/coins/Coins";
 import Coin from "./routes/coins/Coin";
-import { TodoList } from "./routes/todos/TodoList";
+import TodoList from "./routes/todos/TodoList";
 
 function Router() {
   return (
