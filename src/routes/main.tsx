@@ -46,6 +46,13 @@ function Main() {
       >
         <LinkPage>투두페이지</LinkPage>
       </Link>
+      <Link
+        to={{
+          pathname: "/animation",
+        }}
+      >
+        <LinkPage>애니메이션즈</LinkPage>
+      </Link>
     </Wrapper>
   );
 }

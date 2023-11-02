@@ -3,6 +3,7 @@ import Coins from "./routes/coins/Coins";
 import Coin from "./routes/coins/Coin";
 import TodoList from "./routes/todos/TodoList";
 import Main from "./routes/main";
+import Animations from "./routes/animations/Animations";
 
 function Router() {
   return (
@@ -16,6 +17,9 @@ function Router() {
         </Route>
         <Route path="/todo">
           <TodoList />
+        </Route>
+        <Route path="/animation">
+          <Animations />
         </Route>
         <Route path="/">
           <Main />
