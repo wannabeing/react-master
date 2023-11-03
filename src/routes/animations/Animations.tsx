@@ -1,27 +1,46 @@
 import styled from "styled-components";
 import {
   motion,
-  Variants,
   useMotionValue,
   useMotionValueEvent,
   useTransform,
-  useScroll,
+  AnimatePresence,
 } from "framer-motion";
+import { useState } from "react";
 
 const Wrapper = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   width: 100vw;
   height: 100vh;
+  background: linear-gradient(135deg, rgb(238, 0, 153), rgb(221, 0, 238));
+`;
+
+const BoxWrapper = styled(motion.div)`
+  width: 50%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 10px;
+  position: relative;
+`;
+
+const Box = styled(motion.div)`
+  place-self: center;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, rgb(238, 0, 153), rgb(221, 0, 238));
-`;
-const Box = styled(motion.div)`
   width: 200px;
   height: 200px;
-  background-color: white;
-  border-radius: 50px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+
+  &:first-child {
+  }
 `;
 
 const Circle = styled(motion.div)`
@@ -32,47 +51,30 @@ const Circle = styled(motion.div)`
   border-radius: 35px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
+const Button = styled.button`
+  cursor: pointer;
+  margin-top: 20px;
+  padding: 20px;
+  border: none;
+  border-radius: 20px;
 
-// 1
-const firstVars: Variants = {
-  initial: {
-    scale: 0,
-  },
-  animate: {
-    scale: 1,
-    rotateZ: 360,
+  &:hover {
+    opacity: 0.8;
+  }
+`;
 
-    transition: {
-      damping: 5,
-      type: "spring",
-    },
-  },
-};
-
-// 2
-const boxVars: Variants = {
-  initial: {
-    opacity: 0,
-    scale: 0.5,
-  },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.5,
-      type: "spring",
-      damping: 5,
-      delayChildren: 0.5,
-      staggerChildren: 0.15,
-    },
-  },
-};
-const circleVars: Variants = {
-  initial: {
-    opacity: 0,
-  },
-  animate: { opacity: 1 },
-};
+const Modal = styled(motion.div)`
+  position: absolute;
+  top: 30%;
+  left: 30%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  border-radius: 20px;
+  background-color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+`;
 
 function Animations() {
   const xOffset = useMotionValue(0);
@@ -81,32 +83,47 @@ function Animations() {
   // 기본값은 0, 변환하면 1이다.
   const xTransform = useTransform(xOffset, [-350, 0, 350], [0, 1, 2]);
 
-  const colorTransform = useTransform(
-    xOffset,
-    [-350, 0, 350],
-    [
-      "linear-gradient(135deg, rgb(0, 186, 238), rgb(0, 12, 238))",
-      "linear-gradient(135deg, rgb(238, 0, 153), rgb(221, 0, 238))",
-      "linear-gradient(135deg, rgb(206, 238, 0), rgb(238, 8, 0))",
-    ]
-  );
-
-  // y 스크롤 값 변수 (0,1 사이값)
-  const { scrollYProgress } = useScroll();
-
   // 값이 변경되는 걸 감지하는 함수
   useMotionValueEvent(xTransform, "change", (val) => {});
 
+  const [modal1, setModal1] = useState(false);
+  const [modal2, setModal2] = useState(false);
+  const [switchBtn, setSwitchBtn] = useState(false);
+
+  const toggleModal1 = () => setModal1((prev) => !prev);
+  const toggleModal2 = () => setModal2((prev) => !prev);
+  const toggleSwitchBtn = () => setSwitchBtn((prev) => !prev);
   return (
-    <Wrapper style={{ background: colorTransform }}>
-      <Box
-        style={{
-          x: xOffset,
-          scale: scrollYProgress,
-        }}
-        drag="x"
-        dragSnapToOrigin
-      />
+    <Wrapper>
+      <BoxWrapper>
+        <AnimatePresence>
+          {!modal1 ? (
+            <Box
+              layoutId="modal1"
+              onClick={toggleModal1}
+              whileHover={{ scaleX: 1.2, originX: 1, scaleY: 1.2, originY: 1 }}
+            />
+          ) : (
+            <Box layoutId="modal1" style={{ opacity: 0 }} />
+          )}
+        </AnimatePresence>
+        {modal1 ? <Modal layoutId="modal1" onClick={toggleModal1} /> : null}
+        <Box>{switchBtn ? <Circle layoutId="circle" /> : null}</Box>
+        <Box>{!switchBtn ? <Circle layoutId="circle" /> : null}</Box>
+        <AnimatePresence>
+          {!modal2 ? (
+            <Box
+              layoutId="modal2"
+              onClick={toggleModal2}
+              whileHover={{ scaleX: 1.2, originX: 0, scaleY: 1.2, originY: 0 }}
+            />
+          ) : (
+            <Box layoutId="modal2" style={{ opacity: 0 }} />
+          )}
+        </AnimatePresence>
+        {modal2 ? <Modal layoutId="modal2" onClick={toggleModal2} /> : null}
+      </BoxWrapper>
+      <Button onClick={toggleSwitchBtn}>SWITCH</Button>
     </Wrapper>
   );
 }
