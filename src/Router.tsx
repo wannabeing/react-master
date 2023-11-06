@@ -6,7 +6,7 @@ import Animations from "./routes/animations/Animations";
 import Home from "./routes/nomflix/Home";
 import Search from "./routes/nomflix/Search";
 import Tv from "./routes/nomflix/Tv";
-import Header from "./components/Header";
+import Header from "./routes/nomflix/components/Header";
 
 function Router() {
   return (
@@ -25,13 +25,13 @@ function Router() {
         <Route path="/animation">
           <Animations />
         </Route>
-        <Route path="/search">
+        <Route path={["/search", "/search/:id"]}>
           <Search />
         </Route>
-        <Route path="/tv">
+        <Route path={["/tv", "tv/:tvID"]}>
           <Tv />
         </Route>
-        <Route path="/">
+        <Route path={["/", "/movies/:movieID"]}>
           <Home />
         </Route>
       </Switch>

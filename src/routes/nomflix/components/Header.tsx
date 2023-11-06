@@ -5,10 +5,16 @@ import {
   useScroll,
   useMotionValueEvent,
 } from "framer-motion";
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link, useHistory, useRouteMatch } from "react-router-dom";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+interface ISearch {
+  search: string;
+}
 
 const Nav = styled(motion.nav)`
+  z-index: 1;
   position: fixed;
   top: 0;
   display: flex;
@@ -16,7 +22,6 @@ const Nav = styled(motion.nav)`
   align-items: center;
   width: 100%;
   height: 10vh;
-
   padding: 10px 20px;
   font-size: 14px;
 `;
@@ -58,7 +63,7 @@ const ActiveMenu = styled(motion.span)`
   background-color: ${(props) => props.theme.accentColor};
 `;
 
-const Search = styled.span`
+const Search = styled.form`
   position: relative;
   display: flex;
   align-items: center;
@@ -99,11 +104,14 @@ const logoVars = {
 const navVars = {
   initial: {
     backgroundColor: "rgba(255,255,255,0)",
-    color: "rgba(255,255,255,1",
+    color: "rgba(255,255,255,1)",
   },
   animate: {
     backgroundColor: "rgba(255,255,255,1)",
-    color: "rgba(0,0,0,1",
+    color: "rgba(0,0,0,1)",
+    transition: {
+      duration: 1,
+    },
   },
 };
 
@@ -119,12 +127,14 @@ function Header() {
 
   // state
   const [clickSearch, setClicksearch] = useState(false);
+
+  // hooks
   const { scrollY } = useScroll();
+  const { register, handleSubmit, setFocus, setValue } = useForm<ISearch>();
+  const history = useHistory();
 
   // eventListeners
   useMotionValueEvent(scrollY, "change", (currentScrollY) => {
-    console.log(currentScrollY);
-
     if (currentScrollY > 80) {
       navAni.start("animate");
     } else {
@@ -150,7 +160,13 @@ function Header() {
       });
     }
 
+    setFocus("search");
     setClicksearch((prev) => !prev);
+  };
+
+  const onSearchValid = (data: ISearch) => {
+    history.push(`/search?keyword=${data.search}`);
+    setValue("search", "");
   };
 
   return (
@@ -185,11 +201,11 @@ function Header() {
       </Col>
       <Col>
         {/* 검색 컴포넌트 */}
-        <Search>
+        <Search onSubmit={handleSubmit(onSearchValid)}>
           <motion.svg
             onClick={onClickSearch}
             animate={searchIconAni}
-            transition={{ type: "linear" }}
+            transition={{ type: "tween" }}
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -200,6 +216,7 @@ function Header() {
             ></path>
           </motion.svg>
           <SearchInput
+            {...register("search", { required: true, minLength: 3 })}
             initial={{
               scale: 0,
             }}
